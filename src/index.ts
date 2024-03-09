@@ -5,7 +5,19 @@ import { useAzureMonitor } from "@azure/monitor-opentelemetry";
 
 const app = express();
 
-app.get("/", (req: Request, res: Response) => res.send("Hello World!!"));
+/** this is an express middleware that takes the query parameter named 'delay'
+ * from the query string and delays the response by that amount of time in milliseconds.
+ */
+app.use((req, _, next) => {
+  const delay = req.query.delay;
+  if (delay && typeof delay === "string") {
+    setTimeout(next, parseInt(delay, 10));
+  } else {
+    next();
+  }
+});
+
+app.get("/", (req: Request, res: Response) => res.send("Hello World!!!"));
 
 const port: string | number = process.env.PORT || 3000;
 
@@ -82,21 +94,9 @@ async function queryCollection() {
 app.get("/query", (_: Request, res: Response) => {
   queryCollection()
     .catch((err) => {
-      res.send(err);
+      res.json(JSON.stringify(err));
     })
     .then((r) => {
-      res.send(r);
+      res.json(JSON.stringify(r));
     });
-});
-
-/** this is an express middleware that takes the query parameter named 'delay'
- * from the query string and delays the response by that amount of time in milliseconds.
- */
-app.use((req, _, next) => {
-  const delay = req.query.delay;
-  if (delay && typeof delay === "string") {
-    setTimeout(next, parseInt(delay, 10));
-  } else {
-    next();
-  }
 });
