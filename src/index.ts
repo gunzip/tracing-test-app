@@ -48,3 +48,55 @@ useAzureMonitor({
 //     new ExpressInstrumentation(),
 //   ],
 // });
+
+// Query cosmos db
+
+import { CosmosClient } from "@azure/cosmos";
+const client = new CosmosClient(process.env.COSMOS_DB_CONNECTION_STRING ?? "");
+
+async function queryCollection() {
+  const { database } = await client.databases.createIfNotExists({
+    id: "SampleDB",
+  });
+  const { container } = await database.containers.createIfNotExists({
+    id: "Persons",
+  });
+
+  const querySpec = {
+    query: "SELECT * FROM c WHERE c.firstname = @value",
+    parameters: [
+      {
+        name: "@value",
+        value: "Eva",
+      },
+    ],
+  };
+
+  const { resources: items } = await container.items
+    .query(querySpec)
+    .fetchAll();
+
+  return items;
+}
+
+app.get("/query", (_: Request, res: Response) => {
+  queryCollection()
+    .catch((err) => {
+      res.send(err);
+    })
+    .then((r) => {
+      res.send(r);
+    });
+});
+
+/** this is an express middleware that takes the query parameter named 'delay'
+ * from the query string and delays the response by that amount of time in milliseconds.
+ */
+app.use((req, _, next) => {
+  const delay = req.query.delay;
+  if (delay && typeof delay === "string") {
+    setTimeout(next, parseInt(delay, 10));
+  } else {
+    next();
+  }
+});
