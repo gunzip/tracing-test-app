@@ -136,8 +136,9 @@ app.get("/redis", async (req: Request, res: Response) => {
     );
     const msg = await cacheConnection.get("Message");
     res.send(msg);
+    cacheConnection.disconnect();
   } catch (error) {
+    cacheConnection.disconnect();
     res.status(400).send(error);
   }
-  cacheConnection.disconnect();
 });
