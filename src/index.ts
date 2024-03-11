@@ -22,19 +22,19 @@ useAzureMonitor({
   enableStandardMetrics: true,
 });
 
-// import { registerInstrumentations } from "@opentelemetry/instrumentation";
-// import { HttpInstrumentation } from "@opentelemetry/instrumentation-http";
-// import { ExpressInstrumentation } from "@opentelemetry/instrumentation-express";
-// import { RedisInstrumentation } from "@opentelemetry/instrumentation-redis-4";
+import { registerInstrumentations } from "@opentelemetry/instrumentation";
+import { HttpInstrumentation } from "@opentelemetry/instrumentation-http";
+import { ExpressInstrumentation } from "@opentelemetry/instrumentation-express";
+import { RedisInstrumentation } from "@opentelemetry/instrumentation-redis-4";
 
-// registerInstrumentations({
-//   instrumentations: [
-//     // Express instrumentation expects HTTP layer to be instrumented
-//     new HttpInstrumentation(),
-//     new ExpressInstrumentation(),
-//     new RedisInstrumentation(),
-//   ],
-// });
+registerInstrumentations({
+  instrumentations: [
+    // Express instrumentation expects HTTP layer to be instrumented
+    new HttpInstrumentation(),
+    new ExpressInstrumentation(),
+    new RedisInstrumentation(),
+  ],
+});
 
 import express, { Request, Response } from "express";
 
