@@ -22,6 +22,20 @@ useAzureMonitor({
   enableStandardMetrics: true,
 });
 
+// import { registerInstrumentations } from "@opentelemetry/instrumentation";
+// import { HttpInstrumentation } from "@opentelemetry/instrumentation-http";
+// import { ExpressInstrumentation } from "@opentelemetry/instrumentation-express";
+// import { RedisInstrumentation } from "@opentelemetry/instrumentation-redis-4";
+
+// registerInstrumentations({
+//   instrumentations: [
+//     // Express instrumentation expects HTTP layer to be instrumented
+//     new HttpInstrumentation(),
+//     new ExpressInstrumentation(),
+//     new RedisInstrumentation(),
+//   ],
+// });
+
 import express, { Request, Response } from "express";
 
 import * as redis from "redis";
@@ -58,22 +72,6 @@ app.get("/", (req: Request, res: Response) => res.send("Hello World!!!"));
 const port: string | number = process.env.PORT || 3000;
 
 app.listen(port, () => console.log(`App listening on port ${port}`));
-
-// import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
-// import { registerInstrumentations } from "@opentelemetry/instrumentation";
-// import { HttpInstrumentation } from "@opentelemetry/instrumentation-http";
-// import { ExpressInstrumentation } from "@opentelemetry/instrumentation-express";
-
-// const provider = new NodeTracerProvider();
-// provider.register();
-
-// registerInstrumentations({
-//   instrumentations: [
-//     // Express instrumentation expects HTTP layer to be instrumented
-//     new HttpInstrumentation(),
-//     new ExpressInstrumentation(),
-//   ],
-// });
 
 // Query cosmos db
 
