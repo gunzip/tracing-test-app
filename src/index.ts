@@ -3,6 +3,21 @@ import express, { Request, Response } from "express";
 // Import the `useAzureMonitor()` function from the `@azure/monitor-opentelemetry` package.
 import { useAzureMonitor } from "@azure/monitor-opentelemetry";
 
+import redis from "redis";
+
+// Environment variables for cache
+const cacheHostName = process.env.AZURE_CACHE_FOR_REDIS_HOST_NAME;
+const cachePassword = process.env.AZURE_CACHE_FOR_REDIS_ACCESS_KEY;
+
+if (!cacheHostName) throw Error("AZURE_CACHE_FOR_REDIS_HOST_NAME is empty");
+if (!cachePassword) throw Error("AZURE_CACHE_FOR_REDIS_ACCESS_KEY is empty");
+
+const cacheConnection = redis.createClient({
+  // rediss for TLS
+  url: `rediss://${cacheHostName}:6380`,
+  password: cachePassword,
+});
+
 const app = express();
 
 /** this is an express middleware that takes the query parameter named 'delay'
@@ -99,4 +114,30 @@ app.get("/query", (_: Request, res: Response) => {
     .then((r) => {
       res.json(JSON.stringify(r));
     });
+});
+
+/** the following express endpoint returns a response with the status code given into query parameter */
+app.get("/status", (req: Request, res: Response) => {
+  const status = req.query.status;
+  if (status && typeof status === "string") {
+    res.status(parseInt(status, 10)).send({ status: status });
+  } else {
+    res.status(200).send({ status: status });
+  }
+});
+
+/** the following endpoint connects to a redis instance and get some info about it */
+app.get("/redis", async (req: Request, res: Response) => {
+  try {
+    await cacheConnection.connect();
+    await cacheConnection.set(
+      "Message",
+      "Hello! The cache is working from Node.js!",
+    );
+    const msg = await cacheConnection.get("Message");
+    res.send(msg);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+  cacheConnection.disconnect();
 });
