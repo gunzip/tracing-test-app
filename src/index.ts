@@ -126,19 +126,25 @@ app.get("/status", (req: Request, res: Response) => {
   }
 });
 
+(async function () {
+  await cacheConnection.connect();
+})();
+
 /** the following endpoint connects to a redis instance and get some info about it */
 app.get("/redis", async (_: Request, res: Response) => {
   try {
-    await cacheConnection.connect();
     await cacheConnection.set(
       "Message",
       "Hello! The cache is working from Node.js!",
     );
     const msg = await cacheConnection.get("Message");
     res.send(msg);
-    cacheConnection.disconnect();
   } catch (error) {
-    cacheConnection.disconnect();
     res.status(400).send(error);
   }
+});
+
+process.on("SIGINT", async () => {
+  await cacheConnection.disconnect();
+  process.exit();
 });
