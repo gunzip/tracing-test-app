@@ -127,7 +127,7 @@ app.get("/status", (req: Request, res: Response) => {
 });
 
 /** the following endpoint connects to a redis instance and get some info about it */
-app.get("/redis", async (req: Request, res: Response) => {
+app.get("/redis", async (_: Request, res: Response) => {
   try {
     await cacheConnection.connect();
     await cacheConnection.set(
