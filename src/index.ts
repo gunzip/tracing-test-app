@@ -39,9 +39,11 @@ useAzureMonitor({
 //   ],
 // });
 
-import express, { Request, Response } from "express";
+const { CosmosClient } = require("@azure/cosmos");
+const express = require("express");
+const redis = require("redis");
 
-import * as redis from "redis";
+import type { Application, Request, Response } from "express";
 
 // Environment variables for cache
 const cacheHostName = process.env.AZURE_CACHE_FOR_REDIS_HOST_NAME;
@@ -56,7 +58,7 @@ const cacheConnection = redis.createClient({
   password: cachePassword,
 });
 
-const app = express();
+const app: Application = express();
 
 /** this is an express middleware that takes the query parameter named 'delay'
  * from the query string and delays the response by that amount of time in milliseconds.
@@ -78,8 +80,6 @@ app.listen(port, () => console.log(`App listening on port ${port}`));
 
 // Query cosmos db
 
-import { CosmosClient } from "@azure/cosmos";
-import { HttpInstrumentationConfig } from "@opentelemetry/instrumentation-http";
 const client = new CosmosClient(process.env.COSMOS_DB_CONNECTION_STRING ?? "");
 
 async function queryCollection() {
