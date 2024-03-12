@@ -1,51 +1,10 @@
-import { useAzureMonitor } from "@azure/monitor-opentelemetry";
+import { CosmosClient } from "@azure/cosmos";
+import express from "express";
+import * as redis from "redis";
 
-// Call the `useAzureMonitor()` function to configure OpenTelemetry to use Azure Monitor.
-useAzureMonitor({
-  azureMonitorExporterOptions: {
-    connectionString:
-      process.env["APPLICATIONINSIGHTS_CONNECTION_STRING"] ||
-      "<your connection string>",
-  },
-  instrumentationOptions: {
-    // Instrumentations generating traces
-    azureSdk: { enabled: true },
-    http: { enabled: true },
-    mongoDb: { enabled: true },
-    mySql: { enabled: true },
-    postgreSql: { enabled: true },
-    redis: { enabled: false },
-    redis4: { enabled: true },
-  },
-  samplingRatio: 1.0,
-  enableLiveMetrics: true,
-  enableStandardMetrics: true,
-});
+import type { Request, Response } from "express";
 
-// import { registerInstrumentations } from "@opentelemetry/instrumentation";
-// import {
-//   HttpInstrumentation,
-//   HttpInstrumentationConfig,
-// } from "@opentelemetry/instrumentation-http";
-// import { ExpressInstrumentation } from "@opentelemetry/instrumentation-express";
-// import { RedisInstrumentation } from "@opentelemetry/instrumentation-redis-4";
-
-// registerInstrumentations({
-//   instrumentations: [
-//     // Express instrumentation expects HTTP layer to be instrumented
-//     new HttpInstrumentation(),
-//     new ExpressInstrumentation(),
-//     new RedisInstrumentation(),
-//   ],
-// });
-
-const { CosmosClient } = require("@azure/cosmos");
-const express = require("express");
-const redis = require("redis");
-
-import type { Application, Request, Response } from "express";
-
-// Environment variables for cache
+// Environment variables for redis cache
 const cacheHostName = process.env.AZURE_CACHE_FOR_REDIS_HOST_NAME;
 const cachePassword = process.env.AZURE_CACHE_FOR_REDIS_ACCESS_KEY;
 
@@ -58,7 +17,7 @@ const cacheConnection = redis.createClient({
   password: cachePassword,
 });
 
-const app: Application = express();
+const app = express();
 
 /** this is an express middleware that takes the query parameter named 'delay'
  * from the query string and delays the response by that amount of time in milliseconds.
