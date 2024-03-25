@@ -17,7 +17,7 @@ useAzureMonitor({
     redis: { enabled: false },
     redis4: { enabled: true },
   },
-  samplingRatio: 1.0,
+  samplingRatio: 0.3,
   enableLiveMetrics: true,
   enableStandardMetrics: true,
 });
