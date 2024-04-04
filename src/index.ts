@@ -104,6 +104,25 @@ app.get("/redis", async (_: Request, res: Response) => {
   }
 });
 
+app.get("/redis-db", async (_: Request, res: Response) => {
+  try {
+    await cacheConnection.set(
+      "Message",
+      "Hello! The v2 cache is working from Node.js!",
+    );
+    const msg = await cacheConnection.get("Message");
+
+    // we call the internal endpoint to query
+    const data = await fetch("http://localhost:3000/query").then((r) =>
+      r.json(),
+    );
+
+    res.send(msg + JSON.stringify(data));
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 process.on("SIGINT", async () => {
   await cacheConnection.disconnect();
   process.exit();
