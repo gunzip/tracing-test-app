@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node --require ./dist/instrumentation.js dist/index.js"
+    "start-sdk": "node --require ./dist/instrumentation.js dist/index.js",
+    "start-ai": "node dist/index.js",
+    "debug-sdk": "node --env-file=.env --inspect-brk --require ./dist/instrumentation.js dist/index.js"
   },
   "keywords": [],
   "license": "ISC",

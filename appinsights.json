@@ -1,0 +1,13 @@
+{
+  "samplingPercentage": 80,
+  "enableAutoCollectExternalLoggers": true,
+  "enableAutoCollectConsole": true,
+  "enableAutoCollectPerformance": true,
+  "enableAutoCollectExceptions": true,
+  "enableAutoCollectDependencies": true,
+  "enableAutoDependencyCorrelation": true,
+  "enableAutoCollectIncomingRequestAzureFunctions": true,
+  "enableAutoCollectHeartbeat": true,
+  "enableAutoCollectRequests": true,
+  "enableSendLiveMetrics": true
+}
