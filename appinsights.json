@@ -1,5 +1,5 @@
 {
-  "samplingPercentage": 80,
+  "samplingPercentage": 100,
   "enableAutoCollectExternalLoggers": true,
   "enableAutoCollectConsole": true,
   "enableAutoCollectPerformance": true,
