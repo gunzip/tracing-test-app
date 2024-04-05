@@ -21,28 +21,28 @@ const app = express();
 
 import * as otel from "@opentelemetry/api";
 
-async function fetchWithTracing(
-  url: string,
-  init?: RequestInit,
-): Promise<globalThis.Response> {
-  // Ottiene il contesto attivo di OpenTelemetry
-  const currentContext = otel.context.active();
+// async function fetchWithTracing(
+//   url: string,
+//   init?: RequestInit,
+// ): Promise<globalThis.Response> {
+//   // Ottiene il contesto attivo di OpenTelemetry
+//   const currentContext = otel.context.active();
 
-  // Prepara gli header di tracciamento utilizzando il propagatore di OpenTelemetry
-  const headersWithTracing = {};
-  otel.propagation.inject(currentContext, headersWithTracing);
+//   // Prepara gli header di tracciamento utilizzando il propagatore di OpenTelemetry
+//   const headersWithTracing = {};
+//   otel.propagation.inject(currentContext, headersWithTracing);
 
-  // Aggiunge gli header di tracciamento agli header della richiesta originale
-  const initWithTracing = {
-    ...init,
-    headers: {
-      ...(init?.headers || {}),
-      ...headersWithTracing,
-    },
-  };
+//   // Aggiunge gli header di tracciamento agli header della richiesta originale
+//   const initWithTracing = {
+//     ...init,
+//     headers: {
+//       ...(init?.headers || {}),
+//       ...headersWithTracing,
+//     },
+//   };
 
-  return fetch(url, initWithTracing);
-}
+//   return fetch(url, initWithTracing);
+// }
 
 /** this is an express middleware that takes the query parameter named 'delay'
  * from the query string and delays the response by that amount of time in milliseconds.
@@ -138,7 +138,7 @@ app.get("/redis-db", async (_: Request, res: Response) => {
     const msg = await cacheConnection.get("Message");
 
     // we call the internal endpoint to query
-    const data = await fetchWithTracing(
+    const data = await fetch(
       process.env.WEBSITE_HOSTNAME
         ? `https://${process.env.WEBSITE_HOSTNAME}/query`
         : "http://localhost:3000/query",
