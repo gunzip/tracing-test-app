@@ -4,12 +4,39 @@ import * as redis from "redis";
 
 import type { Request, Response } from "express";
 
+// import { DiagConsoleLogger, DiagLogLevel, diag } from "@opentelemetry/api";
+// diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ALL);
+
 // Environment variables for redis cache
 const cacheHostName = process.env.AZURE_CACHE_FOR_REDIS_HOST_NAME;
 const cachePassword = process.env.AZURE_CACHE_FOR_REDIS_ACCESS_KEY;
 
 if (!cacheHostName) throw Error("AZURE_CACHE_FOR_REDIS_HOST_NAME is empty");
 if (!cachePassword) throw Error("AZURE_CACHE_FOR_REDIS_ACCESS_KEY is empty");
+
+/////// LOGGER
+
+// import { SeverityNumber } from "@opentelemetry/api-logs";
+// import { logs } from "@opentelemetry/api-logs";
+
+// const trackCustomEvent = (
+//   name: string,
+//   properties: Record<string, string>,
+//   loggerName = "default",
+// ) => {
+//   const data /* TelemetryEventData */ = {
+//     // event name
+//     name,
+//     // required even if it has a default value
+//     version: 2,
+//   };
+//   logs.getLogger(loggerName).emit({
+//     severityNumber: SeverityNumber.INFO,
+//     severityText: "INFO",
+//     body: JSON.stringify(data),
+//     attributes: { ...properties, "_MS.baseType": "EventData" },
+//   });
+// };
 
 const cacheConnection = redis.createClient({
   // rediss for TLS
@@ -19,7 +46,9 @@ const cacheConnection = redis.createClient({
 
 const app = express();
 
-import * as otel from "@opentelemetry/api";
+//////////////
+
+// import * as otel from "@opentelemetry/api";
 
 // async function fetchWithTracing(
 //   url: string,
@@ -56,7 +85,20 @@ app.use((req, _, next) => {
   }
 });
 
-app.get("/", (req: Request, res: Response) => res.send("Hello World!!!"));
+import { defaultClient } from "applicationinsights";
+
+app.get("/", (_: Request, res: Response) => {
+  defaultClient.trackEvent({
+    name: "custom.event",
+    properties: {
+      customKey1: "customValue1",
+      customKey2: "customValue2",
+    },
+  });
+  //
+  // loggerProvider.shutdown();
+  res.send("Hello World!!!");
+});
 
 const port: string | number = process.env.PORT || 3000;
 

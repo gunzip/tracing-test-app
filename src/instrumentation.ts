@@ -1,11 +1,17 @@
-import { useAzureMonitor } from "@azure/monitor-opentelemetry";
+// import { useAzureMonitor } from "@azure/monitor-opentelemetry";
+
+import { useAzureMonitor, setup } from "applicationinsights";
+
+process.env.APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL = "NONE";
+
+const aiConnectionString =
+  process.env["APPLICATIONINSIGHTS_CONNECTION_STRING"] ||
+  "<your connection string>";
 
 // Call the `useAzureMonitor()` function to configure OpenTelemetry to use Azure Monitor.
 useAzureMonitor({
   azureMonitorExporterOptions: {
-    connectionString:
-      process.env["APPLICATIONINSIGHTS_CONNECTION_STRING"] ||
-      "<your connection string>",
+    connectionString: aiConnectionString,
   },
   instrumentationOptions: {
     // Instrumentations generating traces
@@ -20,17 +26,22 @@ useAzureMonitor({
   samplingRatio: 1.0,
   enableLiveMetrics: true,
   enableStandardMetrics: true,
+  enableAutoCollectExceptions: true,
+  enableAutoCollectPerformance: true,
 });
 
 import { UndiciInstrumentation } from "@opentelemetry/instrumentation-undici";
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { metrics, trace } from "@opentelemetry/api";
 
+// instrument native node fetch
 registerInstrumentations({
   tracerProvider: trace.getTracerProvider(),
   meterProvider: metrics.getMeterProvider(),
   instrumentations: [new UndiciInstrumentation()],
 });
+
+setup(aiConnectionString).start();
 
 // import { registerInstrumentations } from "@opentelemetry/instrumentation";
 // import {
