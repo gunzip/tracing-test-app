@@ -62,3 +62,4 @@ setup(aiConnectionString).start();
 //     new RedisInstrumentation(),
 //   ],
 // });
+export default defaultClient;
