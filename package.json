@@ -2,6 +2,7 @@
   "name": "tracing-test",
   "version": "1.0.0",
   "description": "Test tracing on Azure",
+  "main": "dist/functions.js",
   "scripts": {
     "build": "tsc",
     "start:app-service-sdk": "node --require ./dist/instrumentation.js dist/app-service.js",

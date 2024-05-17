@@ -22,7 +22,11 @@ const cacheConnection = redis.createClient({
 
 import * as otel from "@opentelemetry/api";
 
-app.get("/", async (req) => ({ body: `Hello, ${req.query.get("name")}!` }));
+app.http("root", {
+  methods: ["GET"],
+  authLevel: "anonymous",
+  handler: async (req) => ({ body: `Hello, ${req.query.get("name")}!` }),
+});
 
 // Query cosmos db
 
@@ -53,31 +57,40 @@ async function queryCollection() {
   return items;
 }
 
-app.get("/query", async () => {
-  const span = otel.trace.getActiveSpan();
-  if (span) {
-    span.addEvent("test-event", {
-      eventKey: "event-value",
-      spanId: span.spanContext().spanId,
-    });
-  }
-  let r: any;
-  try {
-    r = await queryCollection();
-  } catch (err) {
-    return { jsonBody: { err } };
-  }
-  return { jsonBody: { r } };
+app.http("query", {
+  methods: ["GET"],
+  route: "/query",
+  authLevel: "anonymous",
+  handler: async () => {
+    const span = otel.trace.getActiveSpan();
+    if (span) {
+      span.addEvent("test-event", {
+        eventKey: "event-value",
+        spanId: span.spanContext().spanId,
+      });
+    }
+    let r: any;
+    try {
+      r = await queryCollection();
+    } catch (err) {
+      return { jsonBody: { err } };
+    }
+    return { jsonBody: { r } };
+  },
 });
 
 /** the following express endpoint returns a response with the status code given into query parameter */
-app.get("/status", async (req) => {
-  const status = req.query.get("status");
-  if (status && typeof status === "string") {
-    return { status: parseInt(status, 10), jsonBody: { status: status } };
-  } else {
-    return { status: 200, jsonBody: { status } };
-  }
+app.http("status", {
+  route: "/status",
+  authLevel: "anonymous",
+  handler: async (req) => {
+    const status = req.query.get("status");
+    if (status && typeof status === "string") {
+      return { status: parseInt(status, 10), jsonBody: { status: status } };
+    } else {
+      return { status: 200, jsonBody: { status } };
+    }
+  },
 });
 
 (async function () {
@@ -85,38 +98,47 @@ app.get("/status", async (req) => {
 })();
 
 /** the following endpoint connects to a redis instance and get some info about it */
-app.get("/redis", async () => {
-  try {
-    await cacheConnection.set(
-      "Message",
-      "Hello! The cache is working from Node.js!",
-    );
-    const msg = await cacheConnection.get("Message");
-    return { jsonBody: { msg } };
-  } catch (error) {
-    return { status: 400, jsonBody: { error } };
-  }
+app.http("redis", {
+  route: "/redis",
+  authLevel: "anonymous",
+  handler: async () => {
+    try {
+      await cacheConnection.set(
+        "Message",
+        "Hello! The cache is working from Node.js!",
+      );
+      const msg = await cacheConnection.get("Message");
+      return { jsonBody: { msg } };
+    } catch (error) {
+      return { status: 400, jsonBody: { error } };
+    }
+  },
 });
 
-app.get("/redis-db", async () => {
-  try {
-    await cacheConnection.set(
-      "Message",
-      "Hello! The v2 cache is working from Node.js!",
-    );
-    const msg = await cacheConnection.get("Message");
+app.http("redis-db", {
+  route: "/redis-db",
+  methods: ["GET"],
+  authLevel: "anonymous",
+  handler: async () => {
+    try {
+      await cacheConnection.set(
+        "Message",
+        "Hello! The v2 cache is working from Node.js!",
+      );
+      const msg = await cacheConnection.get("Message");
 
-    // we call the internal endpoint to query
-    const data = await fetch(
-      process.env.WEBSITE_HOSTNAME
-        ? `https://${process.env.WEBSITE_HOSTNAME}/query`
-        : "http://localhost:3000/query",
-    ).then((r) => r.json());
+      // we call the internal endpoint to query
+      const data = await fetch(
+        process.env.WEBSITE_HOSTNAME
+          ? `https://${process.env.WEBSITE_HOSTNAME}/query`
+          : "http://localhost:3000/query",
+      ).then((r) => r.json());
 
-    return { status: 200, jsonBody: { msg, data } };
-  } catch (error) {
-    return { status: 400, jsonBody: { error } };
-  }
+      return { status: 200, jsonBody: { msg, data } };
+    } catch (error) {
+      return { status: 400, jsonBody: { error } };
+    }
+  },
 });
 
 process.on("SIGINT", async () => {
