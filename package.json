@@ -1,19 +1,20 @@
 {
-  "name": "app-service",
+  "name": "tracing-test",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Test tracing on Azure",
+  "main": "dist/functions.js",
   "scripts": {
     "build": "tsc",
-    "start-sdk": "node --require ./dist/instrumentation.js dist/index.js",
-    "start-ai": "node dist/index.js",
-    "run-sdk": "node --env-file=.env --require ./dist/instrumentation.js dist/index.js",
-    "debug-sdk": "node --env-file=.env --inspect-brk --require ./dist/instrumentation.js dist/index.js"
+    "start:app-service-sdk": "node --require ./dist/instrumentation.js dist/app-service.js",
+    "start:app-service-ai": "node dist/app-service.js",
+    "dev:app-service-sdk": "node --env-file=.env --require ./dist/instrumentation.js dist/index.js",
+    "debug:app-service-sdk": "node --env-file=.env --inspect-brk --require ./dist/instrumentation.js dist/index.js"
   },
   "keywords": [],
   "license": "ISC",
   "dependencies": {
     "@azure/cosmos": "^4.0.0",
+    "@azure/functions": "^4.5.0",
     "@azure/monitor-opentelemetry": "^1.2.0",
     "@opentelemetry/api": "^1.8.0",
     "@opentelemetry/instrumentation-express": "^0.36.0",

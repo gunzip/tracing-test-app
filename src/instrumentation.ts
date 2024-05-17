@@ -1,6 +1,6 @@
 // import { useAzureMonitor } from "@azure/monitor-opentelemetry";
 
-import { useAzureMonitor, setup } from "applicationinsights";
+import { useAzureMonitor, setup, defaultClient } from "applicationinsights";
 
 process.env.APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL = "NONE";
 
@@ -40,6 +40,9 @@ registerInstrumentations({
   meterProvider: metrics.getMeterProvider(),
   instrumentations: [new UndiciInstrumentation()],
 });
+
+// does this work?
+defaultClient.setAutoPopulateAzureProperties();
 
 setup(aiConnectionString).start();
 
