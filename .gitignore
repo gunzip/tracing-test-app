@@ -4,3 +4,4 @@ dist
 .env.remote
 src/Loader.js
 local.settings.example.json
+local.settings.json
