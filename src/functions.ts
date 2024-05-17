@@ -1,9 +1,8 @@
-import * as ai from "./instrumentation";
+require("./instrumentation");
+
 import { CosmosClient } from "@azure/cosmos";
 import * as redis from "redis";
 import { app } from "@azure/functions";
-
-ai.default.trackEvent({ name: "test-event" });
 
 // import { DiagConsoleLogger, DiagLogLevel, diag } from "@opentelemetry/api";
 // diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ALL);
