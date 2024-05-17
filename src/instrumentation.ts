@@ -42,7 +42,7 @@ registerInstrumentations({
 });
 
 // does this work?
-defaultClient.setAutoPopulateAzureProperties();
+// defaultClient.setAutoPopulateAzureProperties();
 
 setup(aiConnectionString).start();
 
