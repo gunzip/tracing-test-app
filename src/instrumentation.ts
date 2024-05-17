@@ -46,8 +46,8 @@ registerInstrumentations({
 
 setup(aiConnectionString).start();
 
-// defaultClient.context.tags[defaultClient.context.keys.cloudRole] =
-//   "function-test-tracing";
+defaultClient.context.tags[defaultClient.context.keys.cloudRole] =
+  "function-test-tracing";
 
 // import { registerInstrumentations } from "@opentelemetry/instrumentation";
 // import {
