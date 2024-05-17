@@ -44,10 +44,10 @@ registerInstrumentations({
 // does this work?
 // defaultClient.setAutoPopulateAzureProperties();
 
+setup(aiConnectionString).start();
+
 defaultClient.context.tags[defaultClient.context.keys.cloudRole] =
   "function-test-tracing";
-
-setup(aiConnectionString).start();
 
 // import { registerInstrumentations } from "@opentelemetry/instrumentation";
 // import {
