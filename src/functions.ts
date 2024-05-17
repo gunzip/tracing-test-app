@@ -1,3 +1,4 @@
+import * as _ from "./instrumentation";
 import { CosmosClient } from "@azure/cosmos";
 import * as redis from "redis";
 import { app } from "@azure/functions";
@@ -23,6 +24,7 @@ const cacheConnection = redis.createClient({
 import * as otel from "@opentelemetry/api";
 
 app.http("root", {
+  route: "/",
   methods: ["GET"],
   authLevel: "anonymous",
   handler: async (req) => ({ body: `Hello, ${req.query.get("name")}!` }),
