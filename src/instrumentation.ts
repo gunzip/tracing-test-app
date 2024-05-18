@@ -5,7 +5,7 @@ import { useAzureMonitor, defaultClient } from "applicationinsights";
 process.env.APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL = "NONE";
 
 const aiConnectionString =
-  process.env["APPLICATIONINSIGHTS_CONNECTION_STRING"] ||
+  process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"] ||
   "<your connection string>";
 
 // Call the `useAzureMonitor()` function to configure OpenTelemetry to use Azure Monitor.
