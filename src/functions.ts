@@ -20,18 +20,21 @@ const cacheConnection = redis.createClient({
   password: cachePassword,
 });
 
-// const app = express();
+app.hook.appStart(() => {
+  cacheConnection.connect();
+});
 
 import * as otel from "@opentelemetry/api";
+import createAppInsightsWrapper from "./wrapper";
 
 app.http("root", {
   route: "/",
   methods: ["GET"],
   authLevel: "anonymous",
-  handler: async (req) => ({ body: `Hello, ${req.query.get("name")}!` }),
+  handler: createAppInsightsWrapper(async (req) => ({
+    body: `Hello, ${req.query.get("name")}!`,
+  })),
 });
-
-// Query cosmos db
 
 const client = new CosmosClient(process.env.COSMOS_DB_CONNECTION_STRING ?? "");
 
@@ -64,7 +67,7 @@ app.http("query", {
   methods: ["GET"],
   route: "/query",
   authLevel: "anonymous",
-  handler: async () => {
+  handler: createAppInsightsWrapper(async () => {
     const span = otel.trace.getActiveSpan();
     if (span) {
       span.addEvent("test-event", {
@@ -79,7 +82,7 @@ app.http("query", {
       return { jsonBody: { err } };
     }
     return { jsonBody: { r } };
-  },
+  }),
 });
 
 /** the following express endpoint returns a response with the status code given into query parameter */
@@ -96,15 +99,11 @@ app.http("status", {
   },
 });
 
-(async function () {
-  await cacheConnection.connect();
-})();
-
 /** the following endpoint connects to a redis instance and get some info about it */
 app.http("redis", {
   route: "/redis",
   authLevel: "anonymous",
-  handler: async () => {
+  handler: createAppInsightsWrapper(async () => {
     try {
       await cacheConnection.set(
         "Message",
@@ -115,14 +114,14 @@ app.http("redis", {
     } catch (error) {
       return { status: 400, jsonBody: { error } };
     }
-  },
+  }),
 });
 
 app.http("redis-db", {
   route: "/redis-db",
   methods: ["GET"],
   authLevel: "anonymous",
-  handler: async () => {
+  handler: createAppInsightsWrapper(async () => {
     try {
       await cacheConnection.set(
         "Message",
@@ -131,17 +130,15 @@ app.http("redis-db", {
       const msg = await cacheConnection.get("Message");
 
       // we call the internal endpoint to query
-      const data = await fetch(
-        process.env.WEBSITE_HOSTNAME
-          ? `https://${process.env.WEBSITE_HOSTNAME}/query`
-          : "http://localhost:3000/query",
-      ).then((r) => r.json());
+      const data = await fetch("http://localhost:7071/query").then((r) =>
+        r.json(),
+      );
 
       return { status: 200, jsonBody: { msg, data } };
     } catch (error) {
       return { status: 400, jsonBody: { error } };
     }
-  },
+  }),
 });
 
 process.on("SIGINT", async () => {

@@ -1,15 +1,16 @@
 // import { useAzureMonitor } from "@azure/monitor-opentelemetry";
 
-import { useAzureMonitor, defaultClient } from "applicationinsights";
+import * as ai from "applicationinsights";
 
 process.env.APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL = "NONE";
+process.env.APPLICATIONINSIGHTS_LOG_DESTINATION = "file+console";
 
 const aiConnectionString =
   process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"] ||
   "<your connection string>";
 
 // Call the `useAzureMonitor()` function to configure OpenTelemetry to use Azure Monitor.
-useAzureMonitor({
+ai.useAzureMonitor({
   azureMonitorExporterOptions: {
     connectionString: aiConnectionString,
   },
@@ -41,10 +42,36 @@ registerInstrumentations({
   instrumentations: [new UndiciInstrumentation()],
 });
 
-// does this work?
-// defaultClient.setAutoPopulateAzureProperties();
+// const { Resource } = require("@opentelemetry/resources");
+// const {
+//   SemanticResourceAttributes,
+// } = require("@opentelemetry/semantic-conventions");
+// const customResource = new Resource({
+//   [SemanticResourceAttributes.SERVICE_NAME]: "my-service",
+//   [SemanticResourceAttributes.SERVICE_NAMESPACE]: "my-namespace",
+//   [SemanticResourceAttributes.SERVICE_INSTANCE_ID]: "my-instance",
+// });
 
-// setup(aiConnectionString).start();
+// // Create a new AzureMonitorOpenTelemetryOptions object and set the resource property to the customResource object.
+// const options: AzureMonitorOpenTelemetryOptions = {
+//   resource: customResource,
+// };
+
+ai.setup(aiConnectionString)
+  // .setAutoDependencyCorrelation(true)
+  // .setInternalLogging(true, true)
+  // .setAutoCollectRequests(true)
+  // .setAutoCollectPerformance(true, true)
+  // .setAutoCollectExceptions(true)
+  // .setAutoCollectDependencies(true)
+  // .setAutoCollectConsole(true, false)
+  // .setAutoCollectPreAggregatedMetrics(true)
+  // .setSendLiveMetrics(false)
+  // .enableWebInstrumentation(false)
+  .start();
+
+// does this work?
+// ai.defaultClient.setAutoPopulateAzureProperties();
 
 // defaultClient.context.tags[defaultClient.context.keys.cloudRole] =
 //   "function-test-tracing";
@@ -65,4 +92,4 @@ registerInstrumentations({
 //     new RedisInstrumentation(),
 //   ],
 // });
-export default defaultClient;
+export default ai;
