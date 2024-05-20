@@ -9,15 +9,12 @@ import { metrics, trace } from "@opentelemetry/api";
 process.env.APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL = "NONE";
 process.env.APPLICATIONINSIGHTS_LOG_DESTINATION = "file+console";
 
-const aiConnectionString =
-  process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"];
-
-if (aiConnectionString) {
+if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
   console.log("using opetelemetry");
   // Call the `useAzureMonitor()` function to configure OpenTelemetry to use Azure Monitor.
   ai.useAzureMonitor({
     azureMonitorExporterOptions: {
-      connectionString: aiConnectionString,
+      connectionString: process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"],
     },
     instrumentationOptions: {
       // Instrumentations generating traces
@@ -58,7 +55,7 @@ if (aiConnectionString) {
   //   resource: customResource,
   // };
 
-  ai.setup(aiConnectionString).start();
+  ai.setup(process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]).start();
 
   // does this work?
   // ai.defaultClient.setAutoPopulateAzureProperties();
@@ -82,5 +79,19 @@ if (aiConnectionString) {
   //     new RedisInstrumentation(),
   //   ],
   // });
+} else if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRING"]) {
+  console.log("using application insights");
+  ai.setup(process.env["APPLICATIONINSIGHTS_CONNECTION_STRING"])
+    .setAutoDependencyCorrelation(true)
+    .setInternalLogging(false, false)
+    .setAutoCollectRequests(true)
+    .setAutoCollectPerformance(true, true)
+    .setAutoCollectExceptions(true)
+    .setAutoCollectDependencies(true)
+    .setAutoCollectConsole(true, false)
+    .setAutoCollectPreAggregatedMetrics(true)
+    .setSendLiveMetrics(false)
+    .enableWebInstrumentation(false)
+    .start();
 }
 export default ai;

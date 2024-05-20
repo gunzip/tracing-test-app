@@ -8,6 +8,13 @@
 
   "logging": {
     "applicationInsights": {
+      "enableDependencyTracking": true,
+      "httpAutoCollectionOptions": {
+        "enableW3CDistributedTracing": true,
+        "enableResponseHeaderInjection": true,
+        "enableHttpTriggerExtendedInfoCollection": true
+      },
+
       "samplingSettings": {
         "isEnabled": false,
         "excludedTypes": "Request"

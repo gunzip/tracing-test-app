@@ -19,6 +19,12 @@ import { SEMATTRS_HTTP_STATUS_CODE } from "@opentelemetry/semantic-conventions";
 
 export default function createAppInsightsWrapper(func: HttpHandler) {
   return async (req: HttpRequest, invocationContext: InvocationContext) => {
+    if (!process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
+      console.log(
+        `skipping wrapper for function ${invocationContext.functionName}`,
+      );
+      return await func(req, invocationContext);
+    }
     const startTime = Date.now();
 
     // Extract the trace context from the incoming request
