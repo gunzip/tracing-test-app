@@ -26,6 +26,7 @@ app.hook.appStart(() => {
 
 import * as otel from "@opentelemetry/api";
 import createAppInsightsWrapper from "./wrapper";
+import axios from "axios";
 
 app.http("root", {
   route: "/",
@@ -117,8 +118,8 @@ app.http("redis", {
   }),
 });
 
-app.http("redis-db", {
-  route: "/redis-db",
+app.http("redis-fetch", {
+  route: "/redis-fetch",
   methods: ["GET"],
   authLevel: "anonymous",
   handler: createAppInsightsWrapper(async () => {
@@ -133,6 +134,29 @@ app.http("redis-db", {
       const data = await fetch("http://localhost:7071/query").then((r) =>
         r.json(),
       );
+
+      return { status: 200, jsonBody: { msg, data } };
+    } catch (error) {
+      return { status: 400, jsonBody: { error } };
+    }
+  }),
+});
+
+app.http("redis-axios", {
+  route: "/redis-axios",
+  methods: ["GET"],
+  authLevel: "anonymous",
+  handler: createAppInsightsWrapper(async () => {
+    try {
+      await cacheConnection.set(
+        "Message",
+        "Hello! The v2 cache is working from Node.js!",
+      );
+      const msg = await cacheConnection.get("Message");
+
+      // we call the internal endpoint to query
+      const response = await axios.get("http://localhost:7071/query");
+      const data = response.data;
 
       return { status: 200, jsonBody: { msg, data } };
     } catch (error) {
