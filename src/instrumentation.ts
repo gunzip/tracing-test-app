@@ -26,7 +26,10 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
       redis: { enabled: false },
       redis4: { enabled: true },
     },
-    samplingRatio: 1.0,
+    // get sampling rate from environment variable
+    samplingRatio: process.env.SAMPLING_RATE
+      ? parseFloat(process.env.SAMPLING_RATE)
+      : 1.0,
     enableLiveMetrics: true,
     enableStandardMetrics: true,
     enableAutoCollectExceptions: true,

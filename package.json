@@ -5,6 +5,7 @@
   "main": "dist/functions.js",
   "scripts": {
     "build": "tsc",
+    "watch": "tsc -w",
     "start:app-service-sdk": "node --require ./dist/instrumentation.js dist/app-service.js",
     "start:app-service-ai": "node dist/app-service.js",
     "dev:app-service-sdk": "node --env-file=.env --require ./dist/instrumentation.js dist/index.js",
