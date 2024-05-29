@@ -9,6 +9,10 @@ import { metrics, trace } from "@opentelemetry/api";
 process.env.APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL = "NONE";
 process.env.APPLICATIONINSIGHTS_LOG_DESTINATION = "file+console";
 
+const samplingRatio = process.env.SAMPLING_RATE
+  ? parseFloat(process.env.SAMPLING_RATE)
+  : 1.0;
+
 if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
   console.log("using opetelemetry");
   // Call the `useAzureMonitor()` function to configure OpenTelemetry to use Azure Monitor.
@@ -27,9 +31,7 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
       redis4: { enabled: true },
     },
     // get sampling rate from environment variable
-    samplingRatio: process.env.SAMPLING_RATE
-      ? parseFloat(process.env.SAMPLING_RATE)
-      : 1.0,
+    samplingRatio,
     enableLiveMetrics: true,
     enableStandardMetrics: true,
     enableAutoCollectExceptions: true,
@@ -58,7 +60,9 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
   //   resource: customResource,
   // };
 
-  ai.setup(process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]).start();
+  ai.setup(process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]);
+  ai.defaultClient.config.samplingPercentage = samplingRatio * 100;
+  ai.start();
 
   // does this work?
   // ai.defaultClient.setAutoPopulateAzureProperties();
@@ -94,7 +98,8 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
     .setAutoCollectConsole(true, false)
     .setAutoCollectPreAggregatedMetrics(true)
     .setSendLiveMetrics(false)
-    .enableWebInstrumentation(false)
-    .start();
+    .enableWebInstrumentation(false);
+  ai.defaultClient.config.samplingPercentage = samplingRatio * 100;
+  ai.start();
 }
 export default ai;
