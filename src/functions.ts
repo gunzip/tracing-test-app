@@ -125,9 +125,9 @@ app.http("redis-fetch", {
       const msg = await cacheConnection.get("Message");
 
       // we call the internal endpoint to query
-      const data = await fetch("http://localhost:7071/query").then((r) =>
-        r.json(),
-      );
+      const data = await fetch(
+        `http://${process.env.WEBSITE_HOSTNAME ?? "localhost:7071"}/query`,
+      ).then((r) => r.json());
 
       return { status: 200, jsonBody: { msg, data } };
     } catch (error) {
