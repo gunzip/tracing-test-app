@@ -1,4 +1,4 @@
-import ai from "./instrumentation";
+require("./instrumentation");
 
 import { CosmosClient } from "@azure/cosmos";
 import * as redis from "redis";
