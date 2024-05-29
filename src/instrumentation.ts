@@ -62,9 +62,10 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
   //   resource: customResource,
   // };
 
-  ai.setup(process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]);
-  ai.defaultClient.config.samplingPercentage = samplingRatio * 100;
-  ai.start();
+  // ai.setup(process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]);
+  // ai.defaultClient.config.samplingPercentage = samplingRatio * 100;
+  // ai.defaultClient.setAutoPopulateAzureProperties();
+  // ai.start();
 
   // does this work?
   // ai.defaultClient.setAutoPopulateAzureProperties();
