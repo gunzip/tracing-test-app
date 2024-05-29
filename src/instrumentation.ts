@@ -9,9 +9,11 @@ import { metrics, trace } from "@opentelemetry/api";
 process.env.APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL = "NONE";
 process.env.APPLICATIONINSIGHTS_LOG_DESTINATION = "file+console";
 
-const samplingRatio = process.env.SAMPLING_RATE
-  ? parseFloat(process.env.SAMPLING_RATE)
-  : 1.0;
+const samplingRatio =
+  process.env.SAMPLING_RATE !== undefined &&
+  !isNaN(parseFloat(process.env.SAMPLING_RATE))
+    ? parseFloat(process.env.SAMPLING_RATE)
+    : 1.0;
 
 if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
   console.log("using opetelemetry");
