@@ -16,7 +16,7 @@ const samplingRatio =
     : 1.0;
 
 if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
-  console.log("using opetelemetry");
+  console.log("using opetelemetry with sampling rate: ", samplingRatio);
   // Call the `useAzureMonitor()` function to configure OpenTelemetry to use Azure Monitor.
   ai.useAzureMonitor({
     azureMonitorExporterOptions: {
@@ -89,7 +89,7 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
   //   ],
   // });
 } else if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRING"]) {
-  console.log("using application insights");
+  console.log("using application insights with sampling rate: ", samplingRatio);
   ai.setup(process.env["APPLICATIONINSIGHTS_CONNECTION_STRING"])
     .setAutoDependencyCorrelation(true)
     .setInternalLogging(false, false)
