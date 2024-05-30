@@ -19,6 +19,12 @@ const samplingRatio =
     ? parseFloat(process.env.SAMPLING_RATE)
     : 1.0;
 
+const disabledInstr = (
+  process.env["APPLICATION_INSIGHTS_NO_PATCH_MODULES"] || ""
+)
+  .split(",")
+  .map((x) => x.trim());
+
 if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
   console.log(
     "using opetelemetry with sampling rate: %d liveMetrics=%s",
@@ -32,13 +38,13 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
     },
     instrumentationOptions: {
       // Instrumentations generating traces
-      azureSdk: { enabled: true },
-      http: { enabled: true },
-      mongoDb: { enabled: true },
-      mySql: { enabled: true },
-      postgreSql: { enabled: true },
+      azureSdk: { enabled: !disabledInstr.includes("azureSdk") },
+      http: { enabled: !disabledInstr.includes("http") },
+      mongoDb: { enabled: !disabledInstr.includes("mongoDb") },
+      mySql: { enabled: !disabledInstr.includes("mySql") },
+      postgreSql: { enabled: !disabledInstr.includes("postgreSql") },
       redis: { enabled: false },
-      redis4: { enabled: true },
+      redis4: { enabled: !disabledInstr.includes("redis") },
     },
     // get sampling rate from environment variable
     samplingRatio,
@@ -48,12 +54,14 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
     enableAutoCollectPerformance: enableLiveMetrics,
   });
 
-  // instrument native node fetch
-  registerInstrumentations({
-    tracerProvider: trace.getTracerProvider(),
-    meterProvider: metrics.getMeterProvider(),
-    instrumentations: [new UndiciInstrumentation()],
-  });
+  if (!disabledInstr.includes("http")) {
+    // instrument native node fetch
+    registerInstrumentations({
+      tracerProvider: trace.getTracerProvider(),
+      meterProvider: metrics.getMeterProvider(),
+      instrumentations: [new UndiciInstrumentation()],
+    });
+  }
 
   // const { Resource } = require("@opentelemetry/resources");
   // const {
