@@ -32,18 +32,20 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
     enableLiveMetrics,
   );
 
-  const { Resource } = require("@opentelemetry/resources");
-  const {
-    SemanticResourceAttributes,
-  } = require("@opentelemetry/semantic-conventions");
-  const customResource = new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]:
-      process.env["WEBSITE_SITE_NAME"] ?? "function-test-tracing-cr",
-    // [SemanticResourceAttributes.SERVICE_NAMESPACE]:
-    //   process.env["WEBSITE__XXX"] ?? "function-test-tracing-ns",
-    [SemanticResourceAttributes.SERVICE_INSTANCE_ID]:
-      process.env["WEBSITE_INSTANCE_ID"] ?? "function-test-tracing-id",
-  });
+  // We don't need this if we set OTEL_SERVICE_NAME in env
+  //
+  // const { Resource } = require("@opentelemetry/resources");
+  // const {
+  //   SemanticResourceAttributes,
+  // } = require("@opentelemetry/semantic-conventions");
+  // const customResource = new Resource({
+  //   [SemanticResourceAttributes.SERVICE_NAME]:
+  //     process.env["WEBSITE_SITE_NAME"] ?? "function-test-tracing-cr",
+  //   // [SemanticResourceAttributes.SERVICE_NAMESPACE]:
+  //   //   process.env["WEBSITE__XXX"] ?? "function-test-tracing-ns",
+  //   [SemanticResourceAttributes.SERVICE_INSTANCE_ID]:
+  //     process.env["WEBSITE_INSTANCE_ID"] ?? "function-test-tracing-id",
+  // });
 
   // // Create a new AzureMonitorOpenTelemetryOptions object and set the resource property to the customResource object.
   // const options: AzureMonitorOpenTelemetryOptions = {
@@ -52,7 +54,7 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
 
   // Call the `useAzureMonitor()` function to configure OpenTelemetry to use Azure Monitor.
   ai.useAzureMonitor({
-    resource: customResource,
+    // resource: customResource,
     azureMonitorExporterOptions: {
       connectionString: process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"],
     },

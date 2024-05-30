@@ -12,8 +12,6 @@ import {
   SEMATTRS_HTTP_METHOD,
   SEMATTRS_HTTP_STATUS_CODE,
   SEMATTRS_HTTP_URL,
-  SEMRESATTRS_SERVICE_INSTANCE_ID,
-  SEMRESATTRS_SERVICE_NAME,
 } from "@opentelemetry/semantic-conventions";
 
 // import {
@@ -61,13 +59,7 @@ export default function createAppInsightsWrapper(func: HttpHandler) {
       ? trace.setSpanContext(activeContext, parentSpanContext)
       : activeContext;
 
-    const serviceName = process.env["WEBSITE_SITE_NAME"] || "unknown_service";
-    const serviceInstanceId =
-      process.env["WEBSITE_INSTANCE_ID"] || "unknown_instance";
-
     const attributes: Attributes = {
-      [SEMRESATTRS_SERVICE_NAME]: serviceName,
-      [SEMRESATTRS_SERVICE_INSTANCE_ID]: serviceInstanceId,
       [SEMATTRS_HTTP_METHOD]: "HTTP",
       [SEMATTRS_HTTP_URL]: req.url,
     };
