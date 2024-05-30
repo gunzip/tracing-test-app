@@ -9,10 +9,11 @@ import {
   trace,
 } from "@opentelemetry/api";
 import {
+  SEMATTRS_HTTP_METHOD,
   SEMATTRS_HTTP_STATUS_CODE,
+  SEMATTRS_HTTP_URL,
   SEMRESATTRS_SERVICE_INSTANCE_ID,
   SEMRESATTRS_SERVICE_NAME,
-  SemanticResourceAttributes,
 } from "@opentelemetry/semantic-conventions";
 
 // import {
@@ -67,8 +68,8 @@ export default function createAppInsightsWrapper(func: HttpHandler) {
     const attributes: Attributes = {
       [SEMRESATTRS_SERVICE_NAME]: serviceName,
       [SEMRESATTRS_SERVICE_INSTANCE_ID]: serviceInstanceId,
-      SEMATTRS_HTTP_METHOD: "HTTP",
-      SEMATTRS_HTTP_URL: req.url,
+      [SEMATTRS_HTTP_METHOD]: "HTTP",
+      [SEMATTRS_HTTP_URL]: req.url,
     };
 
     const options: SpanOptions = {

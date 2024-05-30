@@ -86,11 +86,12 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
   ai.setup(process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"])
     .setSendLiveMetrics(enableLiveMetrics)
     .setAutoCollectPerformance(enableLiveMetrics, false);
+
   ai.defaultClient.config.samplingPercentage = samplingRatio * 100;
 
   // doen't work
-  // ai.defaultClient.context.tags[ai.defaultClient.context.keys.cloudRole] =
-  //   "function-test-tracing"; // process.env.WEBSITE_SITE_NAME
+  ai.defaultClient.context.tags[ai.defaultClient.context.keys.cloudRole] =
+    process.env.WEBSITE_SITE_NAME ?? "no_know_service";
 
   ai.start();
 
