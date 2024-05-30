@@ -97,13 +97,13 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
   //     new RedisInstrumentation(),
   //   ],
   // });
-} else if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRING"]) {
+} else if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGXX"]) {
   console.log(
     "using application insights with sampling rate %d, liveMetrics=%s",
     samplingRatio,
     enableLiveMetrics,
   );
-  ai.setup(process.env["APPLICATIONINSIGHTS_CONNECTION_STRING"])
+  ai.setup(process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGXX"])
     .setAutoDependencyCorrelation(enableLiveMetrics)
     .setInternalLogging(false, false)
     .setAutoCollectRequests(enableLiveMetrics)
