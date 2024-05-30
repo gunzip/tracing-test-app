@@ -31,8 +31,26 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
     samplingRatio,
     enableLiveMetrics,
   );
+
+  const { Resource } = require("@opentelemetry/resources");
+  const {
+    SemanticResourceAttributes,
+  } = require("@opentelemetry/semantic-conventions");
+  const customResource = new Resource({
+    [SemanticResourceAttributes.SERVICE_NAME]: "function-test-tracing-cr",
+    [SemanticResourceAttributes.SERVICE_NAMESPACE]: "function-test-tracing-ns",
+    [SemanticResourceAttributes.SERVICE_INSTANCE_ID]:
+      "function-test-tracing-id",
+  });
+
+  // // Create a new AzureMonitorOpenTelemetryOptions object and set the resource property to the customResource object.
+  // const options: AzureMonitorOpenTelemetryOptions = {
+  //   resource: customResource,
+  // };
+
   // Call the `useAzureMonitor()` function to configure OpenTelemetry to use Azure Monitor.
   ai.useAzureMonitor({
+    resource: customResource,
     azureMonitorExporterOptions: {
       connectionString: process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"],
     },
@@ -63,25 +81,11 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
     });
   }
 
-  // const { Resource } = require("@opentelemetry/resources");
-  // const {
-  //   SemanticResourceAttributes,
-  // } = require("@opentelemetry/semantic-conventions");
-  // const customResource = new Resource({
-  //   [SemanticResourceAttributes.SERVICE_NAME]: "my-service",
-  //   [SemanticResourceAttributes.SERVICE_NAMESPACE]: "my-namespace",
-  //   [SemanticResourceAttributes.SERVICE_INSTANCE_ID]: "my-instance",
-  // });
-
-  // // Create a new AzureMonitorOpenTelemetryOptions object and set the resource property to the customResource object.
-  // const options: AzureMonitorOpenTelemetryOptions = {
-  //   resource: customResource,
-  // };
-
   ai.setup(process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"])
     .setSendLiveMetrics(enableLiveMetrics)
     .setAutoCollectPerformance(enableLiveMetrics, false);
   ai.defaultClient.config.samplingPercentage = samplingRatio * 100;
+
   ai.defaultClient.context.tags[ai.defaultClient.context.keys.cloudRole] =
     "function-test-tracing"; // process.env.WEBSITE_SITE_NAME
   ai.start();
