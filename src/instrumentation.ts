@@ -37,10 +37,12 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
     SemanticResourceAttributes,
   } = require("@opentelemetry/semantic-conventions");
   const customResource = new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: "function-test-tracing-cr",
-    [SemanticResourceAttributes.SERVICE_NAMESPACE]: "function-test-tracing-ns",
+    [SemanticResourceAttributes.SERVICE_NAME]:
+      process.env["WEBSITE_SITE_NAME"] ?? "function-test-tracing-cr",
+    // [SemanticResourceAttributes.SERVICE_NAMESPACE]:
+    //   process.env["WEBSITE__XXX"] ?? "function-test-tracing-ns",
     [SemanticResourceAttributes.SERVICE_INSTANCE_ID]:
-      "function-test-tracing-id",
+      process.env["WEBSITE_INSTANCE_ID"] ?? "function-test-tracing-id",
   });
 
   // // Create a new AzureMonitorOpenTelemetryOptions object and set the resource property to the customResource object.
@@ -86,8 +88,10 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
     .setAutoCollectPerformance(enableLiveMetrics, false);
   ai.defaultClient.config.samplingPercentage = samplingRatio * 100;
 
-  ai.defaultClient.context.tags[ai.defaultClient.context.keys.cloudRole] =
-    "function-test-tracing"; // process.env.WEBSITE_SITE_NAME
+  // doen't work
+  // ai.defaultClient.context.tags[ai.defaultClient.context.keys.cloudRole] =
+  //   "function-test-tracing"; // process.env.WEBSITE_SITE_NAME
+
   ai.start();
 
   // does this work? no! it's a no-op
