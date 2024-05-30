@@ -42,10 +42,10 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
     },
     // get sampling rate from environment variable
     samplingRatio,
-    enableLiveMetrics: true,
-    enableStandardMetrics: true,
-    enableAutoCollectExceptions: true,
-    enableAutoCollectPerformance: true,
+    enableLiveMetrics,
+    enableStandardMetrics: enableLiveMetrics,
+    enableAutoCollectExceptions: enableLiveMetrics,
+    enableAutoCollectPerformance: enableLiveMetrics,
   });
 
   // instrument native node fetch
@@ -70,18 +70,16 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
   //   resource: customResource,
   // };
 
-  ai.setup(
-    process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"],
-  ).setSendLiveMetrics(enableLiveMetrics);
+  ai.setup(process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"])
+    .setSendLiveMetrics(enableLiveMetrics)
+    .setAutoCollectPerformance(enableLiveMetrics, false);
   ai.defaultClient.config.samplingPercentage = samplingRatio * 100;
-  ai.defaultClient.setAutoPopulateAzureProperties();
+  ai.defaultClient.context.tags[ai.defaultClient.context.keys.cloudRole] =
+    "function-test-tracing"; // process.env.WEBSITE_SITE_NAME
   ai.start();
 
-  // does this work?
+  // does this work? no! it's a no-op
   // ai.defaultClient.setAutoPopulateAzureProperties();
-
-  // defaultClient.context.tags[defaultClient.context.keys.cloudRole] =
-  //   "function-test-tracing";
 
   // import { registerInstrumentations } from "@opentelemetry/instrumentation";
   // import {
