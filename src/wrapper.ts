@@ -1,7 +1,6 @@
 import { HttpRequest, InvocationContext, HttpHandler } from "@azure/functions";
 import {
   Attributes,
-  SpanContext,
   SpanKind,
   SpanOptions,
   SpanStatusCode,
@@ -9,7 +8,12 @@ import {
   context,
   trace,
 } from "@opentelemetry/api";
-import { SEMATTRS_HTTP_STATUS_CODE } from "@opentelemetry/semantic-conventions";
+import {
+  SEMATTRS_HTTP_STATUS_CODE,
+  SEMRESATTRS_SERVICE_INSTANCE_ID,
+  SEMRESATTRS_SERVICE_NAME,
+  SemanticResourceAttributes,
+} from "@opentelemetry/semantic-conventions";
 
 // import {
 //   getSpan,
@@ -56,7 +60,13 @@ export default function createAppInsightsWrapper(func: HttpHandler) {
       ? trace.setSpanContext(activeContext, parentSpanContext)
       : activeContext;
 
+    const serviceName = process.env["WEBSITE_SITE_NAME"] || "unknown_service";
+    const serviceInstanceId =
+      process.env["WEBSITE_INSTANCE_ID"] || "unknown_instance";
+
     const attributes: Attributes = {
+      [SEMRESATTRS_SERVICE_NAME]: serviceName,
+      [SEMRESATTRS_SERVICE_INSTANCE_ID]: serviceInstanceId,
       SEMATTRS_HTTP_METHOD: "HTTP",
       SEMATTRS_HTTP_URL: req.url,
     };
@@ -67,7 +77,7 @@ export default function createAppInsightsWrapper(func: HttpHandler) {
       startTime: startTime,
     };
 
-    const span: any = trace
+    const span = trace
       .getTracer("ApplicationInsightsTracer")
       .startSpan(`${req.method} ${req.url}`, options, parentContext);
 
@@ -83,7 +93,7 @@ export default function createAppInsightsWrapper(func: HttpHandler) {
       });
       throw error;
     } finally {
-      const status = (res && res.status) || null;
+      const status = res?.status ?? null;
 
       if (status) {
         span.setStatus({
