@@ -1,4 +1,4 @@
-require("./instrumentation");
+import ai from "./instrumentation";
 
 import { CosmosClient } from "@azure/cosmos";
 import * as redis from "redis";
@@ -69,7 +69,7 @@ app.http("query", {
   route: "/query",
   authLevel: "anonymous",
   handler: createAppInsightsWrapper(async () => {
-    // ai.defaultClient.trackEvent({ name: "my-test-event" });
+    ai.defaultClient.trackEvent({ name: "my-test-event" });
     let r: any;
     try {
       r = await queryCollection();

@@ -9,6 +9,10 @@ import { metrics, trace } from "@opentelemetry/api";
 process.env.APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL = "NONE";
 process.env.APPLICATIONINSIGHTS_LOG_DESTINATION = "file+console";
 
+const enableLiveMetrics =
+  process.env["ENABLE_LIVE_METRICS"] !== "false" &&
+  process.env["ENABLE_LIVE_METRICS"] !== "0";
+
 const samplingRatio =
   process.env.SAMPLING_RATE !== undefined &&
   !isNaN(parseFloat(process.env.SAMPLING_RATE))
@@ -16,7 +20,11 @@ const samplingRatio =
     : 1.0;
 
 if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
-  console.log("using opetelemetry with sampling rate: ", samplingRatio);
+  console.log(
+    "using opetelemetry with sampling rate: %d liveMetrics=%s",
+    samplingRatio,
+    enableLiveMetrics,
+  );
   // Call the `useAzureMonitor()` function to configure OpenTelemetry to use Azure Monitor.
   ai.useAzureMonitor({
     azureMonitorExporterOptions: {
@@ -62,10 +70,12 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
   //   resource: customResource,
   // };
 
-  // ai.setup(process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]);
-  // ai.defaultClient.config.samplingPercentage = samplingRatio * 100;
-  // ai.defaultClient.setAutoPopulateAzureProperties();
-  // ai.start();
+  ai.setup(
+    process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"],
+  ).setSendLiveMetrics(enableLiveMetrics);
+  ai.defaultClient.config.samplingPercentage = samplingRatio * 100;
+  ai.defaultClient.setAutoPopulateAzureProperties();
+  ai.start();
 
   // does this work?
   // ai.defaultClient.setAutoPopulateAzureProperties();
@@ -90,17 +100,21 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
   //   ],
   // });
 } else if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRING"]) {
-  console.log("using application insights with sampling rate: ", samplingRatio);
+  console.log(
+    "using application insights with sampling rate %d, liveMetrics=%s",
+    samplingRatio,
+    enableLiveMetrics,
+  );
   ai.setup(process.env["APPLICATIONINSIGHTS_CONNECTION_STRING"])
     .setAutoDependencyCorrelation(true)
     .setInternalLogging(false, false)
     .setAutoCollectRequests(true)
-    .setAutoCollectPerformance(true, true)
+    .setAutoCollectPerformance(true, false)
     .setAutoCollectExceptions(true)
     .setAutoCollectDependencies(true)
     .setAutoCollectConsole(true, false)
     .setAutoCollectPreAggregatedMetrics(true)
-    .setSendLiveMetrics(false)
+    .setSendLiveMetrics(enableLiveMetrics)
     .enableWebInstrumentation(false);
   ai.defaultClient.config.samplingPercentage = samplingRatio * 100;
   ai.start();
