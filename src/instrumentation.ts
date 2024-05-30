@@ -104,14 +104,14 @@ if (process.env["APPLICATIONINSIGHTS_CONNECTION_STRINGX"]) {
     enableLiveMetrics,
   );
   ai.setup(process.env["APPLICATIONINSIGHTS_CONNECTION_STRING"])
-    .setAutoDependencyCorrelation(true)
+    .setAutoDependencyCorrelation(enableLiveMetrics)
     .setInternalLogging(false, false)
-    .setAutoCollectRequests(true)
-    .setAutoCollectPerformance(true, false)
+    .setAutoCollectRequests(enableLiveMetrics)
+    .setAutoCollectPerformance(enableLiveMetrics, false)
     .setAutoCollectExceptions(true)
-    .setAutoCollectDependencies(true)
-    .setAutoCollectConsole(true, false)
-    .setAutoCollectPreAggregatedMetrics(true)
+    .setAutoCollectDependencies(enableLiveMetrics)
+    .setAutoCollectConsole(false, false)
+    .setAutoCollectPreAggregatedMetrics(enableLiveMetrics)
     .setSendLiveMetrics(enableLiveMetrics)
     .enableWebInstrumentation(false);
   ai.defaultClient.config.samplingPercentage = samplingRatio * 100;
