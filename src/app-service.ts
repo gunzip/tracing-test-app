@@ -1,3 +1,8 @@
+process.env.OTEL_SERVICE_NAME =
+  process.env.WEBSITE_SITE_NAME ?? "local-app-service";
+
+import ai from "./instrumentation";
+
 import { CosmosClient } from "@azure/cosmos";
 import express from "express";
 import * as redis from "redis";
@@ -85,10 +90,8 @@ app.use((req, _, next) => {
   }
 });
 
-import { defaultClient } from "applicationinsights";
-
 app.get("/", (_: Request, res: Response) => {
-  defaultClient.trackEvent({
+  ai.defaultClient.trackEvent({
     name: "custom.event",
     properties: {
       customKey1: "customValue1",
@@ -171,7 +174,7 @@ app.get("/redis", async (_: Request, res: Response) => {
   }
 });
 
-app.get("/redis-db", async (_: Request, res: Response) => {
+app.get("/redis-fetch", async (_: Request, res: Response) => {
   try {
     await cacheConnection.set(
       "Message",

@@ -14,12 +14,6 @@ import {
   SEMATTRS_HTTP_URL,
 } from "@opentelemetry/semantic-conventions";
 
-// import {
-//   getSpan,
-//   setSpanContext,
-// } from "@opentelemetry/api/build/src/trace/context-utils";
-// import { SEMATTRS_HTTP_STATUS_CODE } from "@opentelemetry/semantic-conventions";
-
 export default function createAppInsightsWrapper(func: HttpHandler) {
   return async (req: HttpRequest, invocationContext: InvocationContext) => {
     if (
@@ -36,7 +30,7 @@ export default function createAppInsightsWrapper(func: HttpHandler) {
     // Extract the trace context from the incoming request
     const traceParent = req.headers.get("traceparent");
 
-    console.log("traceParent", traceParent);
+    // console.log("traceParent", traceParent);
     // console.log("headers", req.headers);
 
     const parts = traceParent?.split("-");

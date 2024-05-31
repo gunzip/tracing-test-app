@@ -24,7 +24,6 @@ app.hook.appStart(() => {
   cacheConnection.connect();
 });
 
-import * as otel from "@opentelemetry/api";
 import createAppInsightsWrapper from "./wrapper";
 import axios from "axios";
 

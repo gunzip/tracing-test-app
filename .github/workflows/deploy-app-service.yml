@@ -67,5 +67,5 @@ jobs:
         with:
           app-name: "tracing-test-app"
           slot-name: "Production"
-          startup-command: "yarn start:app-service-sdk"
+          startup-command: "yarn start"
           package: .
