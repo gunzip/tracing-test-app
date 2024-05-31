@@ -47,6 +47,23 @@ const cacheConnection = redis.createClient({
   // rediss for TLS
   url: `rediss://${cacheHostName}:6380`,
   password: cachePassword,
+  socket: {
+    connectTimeout: 10000, // Connection timeout in milliseconds
+    reconnectStrategy: (retries) => {
+      if (retries >= 10) {
+        return new Error("Max retries reached");
+      }
+      return Math.min(retries * 50, 500); // Exponential backoff
+    },
+  },
+});
+
+cacheConnection.on("error", (err) => {
+  console.error("Redis client error:", err);
+});
+
+cacheConnection.connect().catch((err) => {
+  console.error("Could not connect to Redis:", err);
 });
 
 const app = express();
