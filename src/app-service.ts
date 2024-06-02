@@ -173,10 +173,6 @@ app.get("/status", (req: Request, res: Response) => {
   }
 });
 
-(async function () {
-  await cacheConnection.connect();
-})();
-
 /** the following endpoint connects to a redis instance and get some info about it */
 app.get("/redis", async (_: Request, res: Response) => {
   try {
