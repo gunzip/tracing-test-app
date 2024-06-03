@@ -7,6 +7,8 @@ import {
   TraceFlags,
   context,
   trace,
+  Span,
+  SpanContext,
 } from "@opentelemetry/api";
 import {
   SEMATTRS_HTTP_METHOD,
@@ -29,13 +31,9 @@ export default function createAppInsightsWrapper(func: HttpHandler) {
 
     // Extract the trace context from the incoming request
     const traceParent = req.headers.get("traceparent");
-
-    // console.log("traceParent", traceParent);
-    // console.log("headers", req.headers);
-
     const parts = traceParent?.split("-");
 
-    const parentSpanContext =
+    const parentSpanContext: SpanContext | null =
       parts &&
       parts.length === 4 &&
       parts[1].length === 32 &&
@@ -49,6 +47,7 @@ export default function createAppInsightsWrapper(func: HttpHandler) {
 
     const activeContext = context.active();
 
+    // Set span context as the parent context if any
     const parentContext = parentSpanContext
       ? trace.setSpanContext(activeContext, parentSpanContext)
       : activeContext;
@@ -64,7 +63,7 @@ export default function createAppInsightsWrapper(func: HttpHandler) {
       startTime: startTime,
     };
 
-    const span = trace
+    const span: Span = trace
       .getTracer("ApplicationInsightsTracer")
       .startSpan(`${req.method} ${req.url}`, options, parentContext);
 
@@ -73,22 +72,20 @@ export default function createAppInsightsWrapper(func: HttpHandler) {
       res = await context.with(trace.setSpan(activeContext, span), async () => {
         return await func(req, invocationContext);
       });
-    } catch (error) {
-      span.setStatus({
-        code: SpanStatusCode.ERROR,
-        message: JSON.stringify(error),
-      });
-      throw error;
-    } finally {
-      const status = res?.status ?? null;
-
+      const status = res?.status;
       if (status) {
         span.setStatus({
           code: status < 400 ? SpanStatusCode.OK : SpanStatusCode.ERROR,
         });
         span.setAttribute(SEMATTRS_HTTP_STATUS_CODE, status);
       }
-
+    } catch (error) {
+      span.setStatus({
+        code: SpanStatusCode.ERROR,
+        message: error instanceof Error ? error.message : JSON.stringify(error),
+      });
+      throw error;
+    } finally {
       span.end(Date.now());
     }
 
