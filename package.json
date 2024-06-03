@@ -6,7 +6,6 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "test": "node --require ./dist/instrumentation.js dist/app-service.js",
     "start": "node dist/app-service.js",
     "dev": "node --env-file=.env dist/app-service.js",
     "debug": "node --env-file=.env --inspect-brk dist/app-service.js"

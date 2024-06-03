@@ -1,6 +1,3 @@
-process.env.OTEL_SERVICE_NAME =
-  process.env.WEBSITE_SITE_NAME ?? "local-app-service";
-
 import ai from "./instrumentation";
 
 import { CosmosClient } from "@azure/cosmos";

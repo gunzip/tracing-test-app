@@ -7,6 +7,11 @@ const originalHttpsRequest = https.request;
 
 type OptionsT = string | http.RequestOptions | URL;
 
+function logStackTrace() {
+  const err = new Error();
+  console.log(err.stack);
+}
+
 function checkKeepAlive(options: OptionsT) {
   if (!(options as any).agent) {
     return console.warn("No agent detected", options);
@@ -17,12 +22,14 @@ function checkKeepAlive(options: OptionsT) {
 
 // Override della funzione request di HTTP
 http.request = function (options, callback) {
+  logStackTrace();
   checkKeepAlive(options);
   return originalHttpRequest.call(http, options as any, callback as any);
 };
 
 // Override della funzione request di HTTPS
 https.request = function (options, callback) {
+  logStackTrace();
   checkKeepAlive(options);
   return originalHttpsRequest.call(https, options as any, callback as any);
 };
