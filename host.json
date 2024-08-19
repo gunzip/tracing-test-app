@@ -20,5 +20,7 @@
         "excludedTypes": "Request"
       }
     }
-  }
+  },
+
+  "telemetryMode": "openTelemetry"
 }
