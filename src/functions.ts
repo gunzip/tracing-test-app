@@ -24,16 +24,16 @@ app.hook.appStart(() => {
   cacheConnection.connect();
 });
 
-import createAppInsightsWrapper from "./wrapper";
+// import createAppInsightsWrapper from "./wrapper";
 import axios from "axios";
 
 app.http("root", {
   route: "/",
   methods: ["GET"],
   authLevel: "anonymous",
-  handler: createAppInsightsWrapper(async (req) => ({
+  handler: async (req) => ({
     body: `Hello, ${req.query.get("name")}!`,
-  })),
+  }),
 });
 
 const client = new CosmosClient(process.env.COSMOS_DB_CONNECTION_STRING ?? "");
@@ -67,7 +67,7 @@ app.http("query", {
   methods: ["GET"],
   route: "/query",
   authLevel: "anonymous",
-  handler: createAppInsightsWrapper(async () => {
+  handler: async () => {
     ai.defaultClient.trackEvent({ name: "my-test-event" });
     let r: any;
     try {
@@ -76,7 +76,7 @@ app.http("query", {
       return { jsonBody: { err } };
     }
     return { jsonBody: { r } };
-  }),
+  },
 });
 
 /** the following express endpoint returns a response with the status code given into query parameter */
@@ -97,7 +97,7 @@ app.http("status", {
 app.http("redis", {
   route: "/redis",
   authLevel: "anonymous",
-  handler: createAppInsightsWrapper(async () => {
+  handler: async () => {
     try {
       await cacheConnection.set(
         "Message",
@@ -108,14 +108,14 @@ app.http("redis", {
     } catch (error) {
       return { status: 400, jsonBody: { error } };
     }
-  }),
+  },
 });
 
 app.http("redis-fetch", {
   route: "/redis-fetch",
   methods: ["GET"],
   authLevel: "anonymous",
-  handler: createAppInsightsWrapper(async () => {
+  handler: async () => {
     try {
       await cacheConnection.set(
         "Message",
@@ -132,14 +132,14 @@ app.http("redis-fetch", {
     } catch (error) {
       return { status: 400, jsonBody: { error } };
     }
-  }),
+  },
 });
 
 app.http("redis-axios", {
   route: "/redis-axios",
   methods: ["GET"],
   authLevel: "anonymous",
-  handler: createAppInsightsWrapper(async () => {
+  handler: async () => {
     try {
       await cacheConnection.set(
         "Message",
@@ -155,7 +155,7 @@ app.http("redis-axios", {
     } catch (error) {
       return { status: 400, jsonBody: { error } };
     }
-  }),
+  },
 });
 
 process.on("SIGINT", async () => {

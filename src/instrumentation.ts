@@ -5,6 +5,9 @@ import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { metrics, trace } from "@opentelemetry/api";
 import { IJsonConfig } from "applicationinsights/out/src/shim/types";
 
+// function only
+import { AzureFunctionsInstrumentation } from "@azure/functions-opentelemetry-instrumentation";
+
 process.env.APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL = "NONE";
 process.env.APPLICATIONINSIGHTS_LOG_DESTINATION = "file+console";
 
@@ -29,7 +32,10 @@ if (process.env["AI_SDK_CONNECTION_STRING"]) {
   registerInstrumentations({
     tracerProvider: trace.getTracerProvider(),
     meterProvider: metrics.getMeterProvider(),
-    instrumentations: [new UndiciInstrumentation()],
+    instrumentations: [
+      new UndiciInstrumentation(),
+      new AzureFunctionsInstrumentation(),
+    ],
   });
 
   // settings are taken from applicationinsights.json
