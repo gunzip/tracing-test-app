@@ -26,6 +26,7 @@ app.hook.appStart(() => {
 
 // import createAppInsightsWrapper from "./wrapper";
 import axios from "axios";
+import createAppInsightsWrapper from "./wrapper";
 
 app.http("root", {
   route: "/",
@@ -67,7 +68,7 @@ app.http("query", {
   methods: ["GET"],
   route: "/query",
   authLevel: "anonymous",
-  handler: async () => {
+  handler: createAppInsightsWrapper(async () => {
     ai.defaultClient.trackEvent({ name: "my-test-event" });
     let r: any;
     try {
@@ -76,28 +77,28 @@ app.http("query", {
       return { jsonBody: { err } };
     }
     return { jsonBody: { r } };
-  },
+  }),
 });
 
 /** the following express endpoint returns a response with the status code given into query parameter */
 app.http("status", {
   route: "/status",
   authLevel: "anonymous",
-  handler: async (req) => {
+  handler: createAppInsightsWrapper(async (req) => {
     const status = req.query.get("status");
     if (status && typeof status === "string") {
       return { status: parseInt(status, 10), jsonBody: { status: status } };
     } else {
       return { status: 200, jsonBody: { status } };
     }
-  },
+  }),
 });
 
 /** the following endpoint connects to a redis instance and get some info about it */
 app.http("redis", {
   route: "/redis",
   authLevel: "anonymous",
-  handler: async () => {
+  handler: createAppInsightsWrapper(async () => {
     try {
       await cacheConnection.set(
         "Message",
@@ -108,14 +109,14 @@ app.http("redis", {
     } catch (error) {
       return { status: 400, jsonBody: { error } };
     }
-  },
+  }),
 });
 
 app.http("redis-fetch", {
   route: "/redis-fetch",
   methods: ["GET"],
   authLevel: "anonymous",
-  handler: async () => {
+  handler: createAppInsightsWrapper(async () => {
     try {
       await cacheConnection.set(
         "Message",
@@ -132,14 +133,14 @@ app.http("redis-fetch", {
     } catch (error) {
       return { status: 400, jsonBody: { error } };
     }
-  },
+  }),
 });
 
 app.http("redis-axios", {
   route: "/redis-axios",
   methods: ["GET"],
   authLevel: "anonymous",
-  handler: async () => {
+  handler: createAppInsightsWrapper(async () => {
     try {
       await cacheConnection.set(
         "Message",
@@ -155,7 +156,7 @@ app.http("redis-axios", {
     } catch (error) {
       return { status: 400, jsonBody: { error } };
     }
-  },
+  }),
 });
 
 process.on("SIGINT", async () => {
