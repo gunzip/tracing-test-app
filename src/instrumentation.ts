@@ -28,6 +28,9 @@ if (process.env["AI_SDK_CONNECTION_STRING"]) {
   process.env.OTEL_SERVICE_NAME =
     process.env.WEBSITE_SITE_NAME ?? "local-app-service";
 
+  // settings are taken from applicationinsights.json
+  ai.setup(process.env["AI_SDK_CONNECTION_STRING"]).start();
+
   // instrument native node fetch
   registerInstrumentations({
     tracerProvider: trace.getTracerProvider(),
@@ -37,8 +40,5 @@ if (process.env["AI_SDK_CONNECTION_STRING"]) {
       new AzureFunctionsInstrumentation(),
     ],
   });
-
-  // settings are taken from applicationinsights.json
-  ai.setup(process.env["AI_SDK_CONNECTION_STRING"]).start();
 }
 export default ai;

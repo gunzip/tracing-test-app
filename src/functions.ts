@@ -116,13 +116,15 @@ app.http("redis-fetch", {
   route: "/redis-fetch",
   methods: ["GET"],
   authLevel: "anonymous",
-  handler: createAppInsightsWrapper(async () => {
+  handler: createAppInsightsWrapper(async (_, ctx) => {
     try {
       await cacheConnection.set(
         "Message",
         "Hello! The v2 cache is working from Node.js!",
       );
       const msg = await cacheConnection.get("Message");
+
+      ctx.log("This log will be related to the span");
 
       // we call the internal endpoint to query
       const data = await fetch(

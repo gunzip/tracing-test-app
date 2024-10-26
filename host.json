@@ -7,6 +7,12 @@
   },
 
   "logging": {
+    "logLevel": {
+      "default": "Information",
+      "Host.Results": "Error",
+      "Function": "Error",
+      "Host.Aggregator": "Information"
+    },
     "applicationInsights": {
       "enableDependencyTracking": true,
       "httpAutoCollectionOptions": {
