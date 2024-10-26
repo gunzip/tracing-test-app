@@ -47,6 +47,9 @@ export default function createAppInsightsWrapper(func: HttpHandler) {
 
     const activeContext = context.active();
 
+    // get active context current span
+    const currentSpan = trace.getSpan(activeContext);
+
     // Set span context as the parent context if any
     const parentContext = parentSpanContext
       ? trace.setSpanContext(activeContext, parentSpanContext)
@@ -63,15 +66,32 @@ export default function createAppInsightsWrapper(func: HttpHandler) {
       startTime: startTime,
     };
 
-    const span: Span = trace
-      .getTracer("ApplicationInsightsTracer")
-      .startSpan(`${req.method} ${req.url}`, options, parentContext);
+    const tracer = trace.getTracer("ApplicationInsightsTracer");
+    // const tracer = trace.getTracerProvider().getTracer();
+
+    // get if parentcontext span is not recording
+    const isRecording = currentSpan?.isRecording() === true;
+
+    const span: Span = isRecording
+      ? tracer.startSpan(`${req.method} ${req.url}`, options, parentContext)
+      : tracer.startSpan(`${req.method} ${req.url}`, options);
+
+    // create a new context with the span
+    const newContext = trace.setSpan(activeContext, span);
+
+    const contextWithSpan = trace.setSpan(
+      isRecording ? parentContext : newContext,
+      span,
+    );
 
     let res;
     try {
-      res = await context.with(trace.setSpan(activeContext, span), async () => {
-        return await func(req, invocationContext);
-      });
+      res = await context.with(
+        trace.setSpan(contextWithSpan, span),
+        async () => {
+          return await func(req, invocationContext);
+        },
+      );
       const status = res?.status;
       if (status) {
         span.setStatus({
