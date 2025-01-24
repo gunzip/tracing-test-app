@@ -25,8 +25,8 @@ if (process.env["AI_SDK_CONNECTION_STRING"]) {
     } satisfies Partial<IJsonConfig>);
 
   // setup cloudRoleName
-  process.env.OTEL_SERVICE_NAME =
-    process.env.WEBSITE_SITE_NAME ?? "local-app-service";
+  // process.env.OTEL_SERVICE_NAME =
+  // process.env.WEBSITE_SITE_NAME ?? "local-app-service";
 
   // settings are taken from applicationinsights.json
   ai.setup(process.env["AI_SDK_CONNECTION_STRING"]).start();
