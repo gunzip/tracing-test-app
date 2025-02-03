@@ -5,28 +5,11 @@
       "routePrefix": ""
     }
   },
-
   "logging": {
     "logLevel": {
       "default": "Information",
-      "Host.Results": "Error",
-      "Function": "Error",
-      "Host.Aggregator": "Information"
-    },
-    "applicationInsights": {
-      "enableDependencyTracking": true,
-      "httpAutoCollectionOptions": {
-        "enableW3CDistributedTracing": true,
-        "enableResponseHeaderInjection": true,
-        "enableHttpTriggerExtendedInfoCollection": true
-      },
-
-      "samplingSettings": {
-        "isEnabled": false,
-        "excludedTypes": "Request"
-      }
+      "Worker": "Warning",
+      "Microsoft": "Warning"
     }
-  },
-
-  "telemetryMode": "OpenTelemetry"
+  }
 }

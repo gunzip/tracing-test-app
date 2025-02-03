@@ -19,7 +19,6 @@ import {
 export default function createAppInsightsWrapper(func: HttpHandler) {
   return async (req: HttpRequest, invocationContext: InvocationContext) => {
     if (
-      !process.env["AI_SDK_CONNECTION_STRING"] ||
       process.env["DISABLE_FUNCTION_WRAPPER"]
     ) {
       console.log(
