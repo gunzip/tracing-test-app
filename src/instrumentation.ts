@@ -43,9 +43,12 @@ if ((process.env["APPLICATIONINSIGHTS_CONNECTION_STRING"] || process.env["AI_CON
     ai.setup(process.env["AI_CONNECTION_STRING"]);
   }
 
-  // this enables sampling for traces and custom events
-  ai.defaultClient.config.azureMonitorOpenTelemetryOptions.enableTraceBasedSamplingForLogs = true;
   ai.defaultClient.config.samplingPercentage = Number(process.env["APPINSIGHTS_SAMPLING_PERCENTAGE"]) || 100;
+
+  // this enables sampling for traces and custom events
+  ai.defaultClient.config.azureMonitorOpenTelemetryOptions = {
+    enableTraceBasedSamplingForLogs : true
+  }
 
   ai.start();
 
